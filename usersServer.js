@@ -7,7 +7,40 @@ let users = [];
 
 //Get All Users
 app.get('/users', (req, res) => {
-    res.status(200).json(users);
+
+    //Pagination
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 5;
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    const paginatedUser = users.slice(startIndex, endIndex);
+
+
+    //Searching, Filtering
+    const name = req.query.name;
+
+    if(name) {
+         const filteredUser = paginatedUser.filter(u => u.name.toLowerCase().includes(name.toLowerCase()));
+
+    if(filteredUser.length === 0)  {
+        return res.status(404).json({
+            message: "No users found"
+        })
+    }
+
+    return res.json(filteredUser);
+
+    };
+
+
+    //Sorting
+
+
+     res.status(200).json(paginatedUser);
+
+    
 })
 
 app.get('/users/:id', (req, res) => {
